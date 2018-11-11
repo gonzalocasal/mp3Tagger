@@ -27,17 +27,31 @@ public class GoogleSearcher {
 
     public String findSongYear(String songName) {
         try {
-            String fooResourceUrl = "https://www.google.com.ar/search?q="+ songName;
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("User-Agent", "eltabo");
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<String> response =  restTemplate.exchange(fooResourceUrl, HttpMethod.GET, entity,String.class);
+            String fooResourceUrl = "https://www.google.com.ar/search?q=" + songName;
+            ResponseEntity<String> response = query(fooResourceUrl);
             return  htmlReader.findYearInHtml(response.getBody(), songName);
         } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public String findSongAlbum(String songName) {
+        try {
+            String fooResourceUrl = "https://www.google.com.ar/search?q=" + songName;
+            ResponseEntity<String> response = query(fooResourceUrl);
+            return  htmlReader.findAlbumInHtml(response.getBody(), songName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private ResponseEntity<String> query(String fooResourceUrl) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent", "eltabo");
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        return restTemplate.exchange(fooResourceUrl, HttpMethod.GET, entity,String.class);
     }
 
 

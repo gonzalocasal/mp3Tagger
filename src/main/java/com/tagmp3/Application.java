@@ -36,24 +36,33 @@ public class Application {
 
             File dir = new File("./music");
             File[] filesList = dir.listFiles();
-            for (File file : filesList) {
-                String songName = fileParser.parseSongName(file.getName());
-                String songYear = googleSearcher.findSongYear(songName);
-                tagFile(file, songYear);
+            if (filesList !=null ) {
+                 for (File file : filesList) {
+                     String songName = fileParser.parseSongName(file.getName());
+                     //String songYear = googleSearcher.findSongYear(songName);
+                     //tagYear(file, songYear);
+                     String songAlbum = googleSearcher.findSongAlbum(songName);
+                     tagYear(file, "", songAlbum);
+                 }
+                 logger.info("TASK COMPLETED");
+             }else{
+                logger.info("Files not found");
             }
-            logger.info("TASK COMPLETED");
-
         };
     }
 
-    private void tagFile(File file, String songYear) throws IOException, UnsupportedTagException, InvalidDataException, NotSupportedException {
-        if (songYear.isEmpty())
-            return;
+    private void tagYear(File file, String songYear, String songAlbum) throws IOException, UnsupportedTagException, InvalidDataException, NotSupportedException {
         Mp3File mp3file = new Mp3File(file.getAbsolutePath());
         ID3v1 id3v1Tag  =  mp3file.getId3v1Tag();
         ID3v2 id3v2Tag = mp3file.getId3v2Tag();
-        id3v1Tag.setYear(songYear);
-        id3v2Tag.setYear(songYear);
+        if (!songYear.isEmpty()) {
+            id3v1Tag.setYear(songYear);
+            id3v2Tag.setYear(songYear);
+        }
+        if (!songAlbum.isEmpty()) {
+            id3v1Tag.setAlbum(songAlbum);
+            id3v2Tag.setAlbum(songAlbum);
+        }
         mp3file.setId3v1Tag(id3v1Tag);
         mp3file.setId3v2Tag(id3v2Tag);
         mp3file.save(file.getName());
