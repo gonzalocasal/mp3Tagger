@@ -30,9 +30,9 @@ public class Application {
 
 
     private static void appy(Mp3File mp3, ID3v2 oldTag, String fileName) throws IOException, NotSupportedException {
-        String songName = fileName.replace(".mp3", "").trim();
-        String artist = songName.split("-")[0];
-        String title = songName.split("-")[1];
+        String songName = fileName.replace(".mp3", "");
+        String artist = songName.split("-")[0].trim();
+        String title = songName.split("-")[1].trim();
         String year = oldTag.getYear();
         byte[] albumImage = oldTag.getAlbumImage();
         String mimeType = oldTag.getAlbumImageMimeType();
