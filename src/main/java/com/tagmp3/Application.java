@@ -3,6 +3,9 @@ package com.tagmp3;
 import com.mpatric.mp3agic.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class Application {
@@ -12,14 +15,18 @@ public class Application {
     private static final String MP3_FILE_EXTENSION = ".mp3";
 
     public static void main(String[] args) throws UnsupportedTagException, NotSupportedException, InvalidDataException, IOException {
+        long time1 = System.nanoTime();
         File dir = new File(".");
         File out = new File(OUTPUT_PATH);
         out.mkdir();
         File[] originalFiles = dir.listFiles();
         readFolder(originalFiles);
-        LOGGER.info("TASK COMPLETED");
+        long time2 = System.nanoTime();
+        long timeTaken = time2 - time1;
+        double seconds = (double)timeTaken / 1_000_000_000.0;
+        LOGGER.info("TASK COMPLETED IN:" +seconds);
     }
-
+    
     private static void readFolder(File[] originalFiles) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
         for (File file : originalFiles) {
             if (file.getName().contains(MP3_FILE_EXTENSION)) {
