@@ -8,3 +8,5 @@ bin/
 .classpath
 .idea/
 out/
+.mp3
+result/
