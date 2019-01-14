@@ -40,8 +40,8 @@ public class Application {
         AudioFile mp3 = AudioFileIO.read(file);
         Tag oldTag = mp3.getTag();
         String songName = file.getName().replace(MP3_FILE_EXTENSION, "");
-        String artist = songName.split("-")[0].trim();
-        String title = songName.split("-")[1].trim();
+        String artist = songName.split(" - ")[0].trim();
+        String title = songName.split(" - ")[1].trim();
         String year = oldTag.getFirst(FieldKey.YEAR);
         String genre = oldTag.getFirst(FieldKey.GENRE);
         Artwork artwork = oldTag.getFirstArtwork();
