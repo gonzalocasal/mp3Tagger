@@ -1,58 +1,62 @@
 package com.tagmp3;
 
-import com.mpatric.mp3agic.*;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.datatype.Artwork;
+import org.jaudiotagger.tag.id3.ID3v23Tag;
 import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class Application {
 
     private static final Logger LOGGER = Logger.getLogger("Application");
-    private static final String OUTPUT_PATH = "result/";
     private static final String MP3_FILE_EXTENSION = ".mp3";
 
-    public static void main(String[] args) throws UnsupportedTagException, NotSupportedException, InvalidDataException, IOException {
+    public static void main(String[] args)  {
         long time1 = System.nanoTime();
         File dir = new File(".");
-        File out = new File(OUTPUT_PATH);
-        out.mkdir();
         File[] originalFiles = dir.listFiles();
-        readFolder(originalFiles);
+        for (File file : Objects.requireNonNull(originalFiles))
+            readFolder(file);
         long time2 = System.nanoTime();
         long timeTaken = time2 - time1;
-        double seconds = (double)timeTaken / 1_000_000_000.0;
-        LOGGER.info("TASK COMPLETED IN:" +seconds);
+        double seconds = (double) timeTaken / 1_000_000_000.0;
+        LOGGER.info("Task completed in: " + seconds+ " seconds");
     }
-    
-    private static void readFolder(File[] originalFiles) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
-        for (File file : originalFiles) {
-            if (file.getName().contains(MP3_FILE_EXTENSION)) {
-                Mp3File mp3 = new Mp3File(file.getAbsolutePath());
-                ID3v2 tag = mp3.getId3v2Tag();
-                LOGGER.info(file.getName());
-                appy(mp3, tag, file.getName());
-            }
+
+    private static void readFolder(File file) {
+        try{
+            if (file.getName().contains(MP3_FILE_EXTENSION))
+                processFile(file);
+        }catch (Exception e){
+            LOGGER.info("Error ocurred trying to apply changes on: " + file.getName());
         }
     }
 
-    private static void appy(Mp3File mp3, ID3v2 oldTag, String fileName) throws IOException, NotSupportedException {
-        String songName = fileName.replace(MP3_FILE_EXTENSION, "");
+    private static void processFile(File file) throws Exception {
+        AudioFile mp3 = AudioFileIO.read(file);
+        Tag oldTag = mp3.getTag();
+        String songName = file.getName().replace(MP3_FILE_EXTENSION, "");
         String artist = songName.split("-")[0].trim();
         String title = songName.split("-")[1].trim();
-        String year = oldTag.getYear();
-        byte[] albumImage = oldTag.getAlbumImage();
-        String mimeType = oldTag.getAlbumImageMimeType();
+        String year = oldTag.getFirst(FieldKey.YEAR);
+        String genre = oldTag.getFirst(FieldKey.GENRE);
+        Artwork artwork = oldTag.getFirstArtwork();
+        applyChanges(mp3, songName, artist, title, year, genre, artwork);
+    }
+
+    private static void applyChanges(AudioFile mp3, String songName, String artist, String title, String year, String genre, Artwork artwork) throws Exception  {
         ID3v23Tag newTag = new ID3v23Tag();
-        newTag.setArtist(artist);
-        newTag.setTitle(title);
-        newTag.setAlbum(title);
-        newTag.setYear(year);
-        newTag.setAlbumImage(albumImage,mimeType);
-        mp3.removeId3v1Tag();
-        mp3.setId3v2Tag(newTag);
-        mp3.save(OUTPUT_PATH+fileName);
+        newTag.setField(FieldKey.ARTIST,artist);
+        newTag.setField(FieldKey.TITLE,title);
+        newTag.setField(FieldKey.ALBUM,songName);
+        newTag.setField(FieldKey.YEAR,year);
+        newTag.setField(FieldKey.GENRE,genre);
+        newTag.setField(artwork);
+        mp3.setTag(newTag);
+        AudioFileIO.write(mp3);
     }
 }
