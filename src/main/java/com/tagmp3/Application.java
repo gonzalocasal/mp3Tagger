@@ -49,6 +49,7 @@ public class Application {
     }
 
     private static void applyChanges(AudioFile mp3, String songName, String artist, String title, String year, String genre, Artwork artwork) throws Exception  {
+        AudioFileIO.delete(mp3);
         ID3v23Tag newTag = new ID3v23Tag();
         newTag.setField(FieldKey.ARTIST,artist);
         newTag.setField(FieldKey.TITLE,title);
@@ -56,6 +57,7 @@ public class Application {
         newTag.setField(FieldKey.YEAR,year);
         newTag.setField(FieldKey.GENRE,genre);
         newTag.setField(artwork);
+        newTag.deleteField(FieldKey.TRACK);
         mp3.setTag(newTag);
         AudioFileIO.write(mp3);
     }
