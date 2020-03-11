@@ -17,27 +17,25 @@ public class Application {
     private static final Logger LOGGER = Logger.getLogger("Application");
     private static final String MP3_FILE_EXTENSION = ".mp3";
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) throws Exception {
         Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
         long time1 = System.nanoTime();
         File dir = new File(".");
         File[] originalFiles = dir.listFiles();
-        for (File file : Objects.requireNonNull(originalFiles))
-            readFolder(file);
+
+        for (File file : Objects.requireNonNull(originalFiles)) {
+            if (file.getName().contains(MP3_FILE_EXTENSION)) {
+                processFile(file);
+            }
+        }
+
         long time2 = System.nanoTime();
         long timeTaken = time2 - time1;
         double seconds = (double) timeTaken / 1_000_000_000.0;
         LOGGER.info("Task completed in: " + seconds+ " seconds");
     }
 
-    private static void readFolder(File file) {
-        try{
-            if (file.getName().contains(MP3_FILE_EXTENSION))
-                processFile(file);
-        }catch (Exception e){
-            LOGGER.info("Error ocurred trying to apply changes on: " + file.getName());
-        }
-    }
+
 
     private static void processFile(File file) throws Exception {
         AudioFile mp3 = AudioFileIO.read(file);
@@ -48,11 +46,16 @@ public class Application {
 
         newTag.setField(FieldKey.ARTIST,songName.split(" - ")[0].trim());
         newTag.setField(FieldKey.TITLE,songName.split(" - ")[1].trim());
-        newTag.setField(FieldKey.ALBUM,songName);
-        newTag.setField(FieldKey.YEAR,YearTagResolver.getYear(songName));
+        newTag.setField(FieldKey.ALBUM,songName.split(" - ")[0].trim());
         newTag.setField(FieldKey.GENRE,oldTag.getFirst(FieldKey.GENRE));
         newTag.setField(oldTag.getFirstArtwork());
         newTag.deleteField(FieldKey.TRACK);
+
+        try{
+            newTag.setField(FieldKey.YEAR,YearTagResolver.getYear(songName));
+        } catch (Exception e){
+            LOGGER.info("Error occurred trying to get Year tag on: " + file.getName());
+        }
 
         AudioFileIO.delete(mp3);
 
