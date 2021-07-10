@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static com.tagmp3.util.Constants.MP3_FILE_EXTENSION;
 
