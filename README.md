@@ -4,7 +4,7 @@ Batch application to set mp3 tags based on file name and folder name.
 
 The way that the tags get updated is very personal and specific for my use case, but you can take this and adapt it based on your needs.
 
-The artist and title gets read from file that have this format: 
+The Artist and Title tags gets read from file that have this format: 
 ```
 artist - title.mp3 
 ```
