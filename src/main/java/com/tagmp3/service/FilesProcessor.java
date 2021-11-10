@@ -38,7 +38,7 @@ public class FilesProcessor {
 
     public void process () {
         Instant start = Instant.now();
-        List<String> errorLines = new ArrayList<>();
+        StringBuilder errorLines = new StringBuilder();
 
         for (String genre : genresFolders) {
             log.info("Processing: " + genre);

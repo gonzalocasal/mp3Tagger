@@ -19,20 +19,16 @@ import java.util.List;
 @AllArgsConstructor
 public class ResultsWriter {
 
-    public void export (String outPath, List<String> lines) {
+    public void export (String outPath, StringBuilder lines) {
         log.info("Writing the file {}", outPath);
-        int linesCount = 0;
-
         Path path = Paths.get(outPath);
+        String linesStr = lines.toString();
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            for (String l : lines) {
-                writer.write(l);
-                linesCount++;
-            }
+            writer.write(linesStr);
         } catch (IOException e) {
             throw new RuntimeException(e.getCause());
         }
-        log.info("File write complete. {} lines written.", linesCount);
+        log.info("File write complete. {} lines written.", linesStr.lines().count());
     }
 
 }

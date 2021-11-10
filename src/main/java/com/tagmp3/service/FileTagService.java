@@ -27,7 +27,7 @@ public class FileTagService {
         this.yearTagResolver = yearTagResolver;
     }
 
-    public void processFile(File file, String genre, List<String> errorLines) throws Exception {
+    public void processFile(File file, String genre, StringBuilder errorLines) throws Exception {
         String fileName = file.getName().replace(MP3_FILE_EXTENSION, "");
         AudioFile mp3 = AudioFileIO.read(file);
         Tag oldTag = mp3.getTag();
@@ -41,7 +41,7 @@ public class FileTagService {
         replaceTag(mp3, newTag);
     }
 
-    private ID3v23Tag generateNewTag(File file, String genre, String fileName, Tag oldTag, List<String> errorLines) throws Exception {
+    private ID3v23Tag generateNewTag(File file, String genre, String fileName, Tag oldTag, StringBuilder errorLines) throws Exception {
         ID3v23Tag newTag = new ID3v23Tag();
         newTag.setField(FieldKey.ARTIST, fileName.split(" - ")[0].trim());
         newTag.setField(FieldKey.TITLE, fileName.split(" - ")[1].trim());
@@ -57,7 +57,8 @@ public class FileTagService {
             newTag.setField(FieldKey.YEAR, oldTag.getFirst(FieldKey.YEAR));
 
             String yearTagError = String.format("ERROR occurred trying to get Year tag on: %s", file.getName());
-            errorLines.add(yearTagError);
+            errorLines.append(yearTagError);
+            errorLines.append(System.lineSeparator());
             log.error(yearTagError);
         }
         return newTag;
