@@ -5,8 +5,10 @@ import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,9 +32,8 @@ public class FileTagService {
     public void processFile(File file, String genre, StringBuilder errorLines) throws Exception {
         String fileName = file.getName().replace(MP3_FILE_EXTENSION, "");
         AudioFile mp3 = AudioFileIO.read(file);
-        Tag oldTag = mp3.getTag();
-
-        if (MP3_PROCESSED_COMMENT.equals(oldTag.getFirst(oldTag.getFirst(FieldKey.COMMENT)))){
+        AbstractID3v2Tag oldTag = ((MP3File) mp3).getID3v2Tag();
+        if (MP3_PROCESSED_COMMENT.equals(oldTag.getFirst(FieldKey.COMMENT))){
             return;
         }
 
