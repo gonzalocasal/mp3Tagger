@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.List;
 
 import static com.tagmp3.util.Constants.MP3_FILE_EXTENSION;
 import static com.tagmp3.util.Constants.MP3_PROCESSED_COMMENT;
