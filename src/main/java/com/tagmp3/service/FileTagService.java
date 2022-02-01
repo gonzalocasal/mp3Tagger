@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 
+import static com.tagmp3.util.Constants.FILENAME_ARTIST_TRACK_SEPARATOR;
 import static com.tagmp3.util.Constants.MP3_FILE_EXTENSION;
 import static com.tagmp3.util.Constants.MP3_PROCESSED_COMMENT;
 
@@ -43,9 +44,9 @@ public class FileTagService {
 
     private ID3v23Tag generateNewTag(File file, String genre, String fileName, Tag oldTag, StringBuilder errorLines) throws Exception {
         ID3v23Tag newTag = new ID3v23Tag();
-        newTag.setField(FieldKey.ARTIST, fileName.split(" - ")[0].trim());
-        newTag.setField(FieldKey.TITLE, fileName.split(" - ")[1].trim());
-        newTag.setField(FieldKey.ALBUM, fileName.split(" - ")[0].trim());
+        newTag.setField(FieldKey.ARTIST, fileName.split(FILENAME_ARTIST_TRACK_SEPARATOR)[0].trim());
+        newTag.setField(FieldKey.TITLE, fileName.split(FILENAME_ARTIST_TRACK_SEPARATOR)[1].trim());
+        newTag.setField(FieldKey.ALBUM, fileName.split(FILENAME_ARTIST_TRACK_SEPARATOR)[0].trim());
         newTag.setField(FieldKey.GENRE, genre);
         newTag.setField(oldTag.getFirstArtwork());
         newTag.deleteField(FieldKey.TRACK);
