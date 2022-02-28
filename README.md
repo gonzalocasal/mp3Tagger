@@ -44,7 +44,7 @@ All the other tags are empty, and the Album Artwork remains if the file already 
 
 ### Prerequisites
 * Apache Maven 3.6.3
-* Java 8
+* Java 11
 
 ### Build
 ```
