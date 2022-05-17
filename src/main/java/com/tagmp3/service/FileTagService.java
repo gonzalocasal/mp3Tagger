@@ -1,6 +1,8 @@
 package com.tagmp3.service;
 
-import lombok.extern.log4j.Log4j2;
+import com.tagmp3.Application;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -10,7 +12,6 @@ import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URLEncoder;
@@ -23,11 +24,11 @@ import static com.tagmp3.util.Constants.GOOGLE_SEARCH_URL_SEARCH_PARAM;
 import static com.tagmp3.util.Constants.MP3_FILE_EXTENSION;
 import static com.tagmp3.util.Constants.MP3_PROCESSED_COMMENT;
 
-@Log4j2
-@Component
 public class FileTagService {
 
-    public void processFile(File file, String genre, StringBuilder errorLines) {
+    final static Logger log = LogManager.getLogger(Application.class);
+
+    public void processFile(File file, String genre) {
         if (!file.getName().contains(MP3_FILE_EXTENSION)) {
             return;
         }
@@ -39,22 +40,19 @@ public class FileTagService {
                 return;
             }
 
-            ID3v23Tag newTag = generateNewTag(file, genre, oldTag, errorLines);
+            ID3v23Tag newTag = generateNewTag(file, genre, oldTag);
 
             AudioFileIO.delete(mp3);
             mp3.setTag(newTag);
             AudioFileIO.write(mp3);
 
         } catch (Exception e) {
-            String processError = String.format("ERROR occurred trying to process: %s", file.getName());
-            errorLines.append(processError);
-            errorLines.append(System.lineSeparator());
-            log.error(processError);
+            log.error("ERROR occurred trying to process: {}", file.getName());
         }
 
     }
 
-    private ID3v23Tag generateNewTag(File file, String genre, Tag oldTag, StringBuilder errorLines) {
+    private ID3v23Tag generateNewTag(File file, String genre, Tag oldTag) {
         log.info("Processing: {}", file);
         String fileName = file.getName().replace(MP3_FILE_EXTENSION, "");
         ID3v23Tag newTag = new ID3v23Tag();
@@ -67,7 +65,7 @@ public class FileTagService {
             newTag.deleteField(FieldKey.TRACK);
             newTag.setField(FieldKey.COMMENT, MP3_PROCESSED_COMMENT);
 
-            String yearFromGoogle = getYearFromGoogle(fileName, errorLines);
+            String yearFromGoogle = getYearFromGoogle(fileName);
 
             if (yearFromGoogle != null) {
                 newTag.setField(FieldKey.YEAR, yearFromGoogle);
@@ -76,26 +74,20 @@ public class FileTagService {
             }
 
         } catch (Exception e) {
-            String tagsError = String.format("ERROR occurred trying to generate new tags on: %s", file.getName());
-            errorLines.append(tagsError);
-            errorLines.append(System.lineSeparator());
-            log.error(tagsError);
+            log.error("ERROR occurred trying to generate new tags for: {}", file.getName());
         }
         return newTag;
     }
 
 
-    private String getYearFromGoogle(String songName, StringBuilder errorLines) {
+    private String getYearFromGoogle(String songName) {
         try {
             String url = GOOGLE_SEARCH_URL + URLEncoder.encode(songName + GOOGLE_SEARCH_URL_SEARCH_PARAM, GOOGLE_SEARCH_ENCODE);
             Document doc = Jsoup.connect(url).get();
 
             return doc.getElementsByClass(GOOGLE_SEARCH_MAGIC_CLASS).get(0).childNode(0).toString().trim();
         } catch (Exception e) {
-            String yearTagError = String.format("ERROR occurred trying to get Year tag from Google on: %s", songName);
-            errorLines.append(yearTagError);
-            errorLines.append(System.lineSeparator());
-            log.error(yearTagError);
+            log.error("ERROR occurred trying to get Year tag from Google for: {}", songName);
             return null;
         }
     }
