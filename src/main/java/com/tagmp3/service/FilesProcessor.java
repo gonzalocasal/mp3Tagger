@@ -7,11 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.time.Duration;
-import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
-
-import static com.tagmp3.util.Constants.MP3_FILE_EXTENSION;
+import java.util.Objects;
 
 @Log4j2
 @Component
@@ -28,6 +26,7 @@ public class FilesProcessor {
                           @Value("#{'${genres.folders}'.split(',')}") List<String> genresFolders,
                           @Autowired ResultsWriter resultsWriter,
                           @Autowired FileTagService fileTagService) {
+
         this.rootFolder = rootFolder;
         this.errorOutPutFile = errorOutPutFile;
         this.genresFolders = genresFolders;
@@ -36,30 +35,19 @@ public class FilesProcessor {
     }
 
     public void process () {
-        Instant start = Instant.now();
+
         StringBuilder errorLines = new StringBuilder();
 
-        for (String genre : genresFolders) {
-            log.info("Processing: " + genre);
+        genresFolders.parallelStream().forEach(genre -> {
+            log.info("Processing: {}", genre);
             File dir = new File(rootFolder + genre);
-            File[] files = dir.listFiles();
+            List<File> files = Arrays.asList(Objects.requireNonNull(dir.listFiles()));
+            files.forEach(file -> {
+                fileTagService.processFile(file, genre, errorLines);
+            });
+        });
 
-            if (files != null) {
-                for (File file : files) {
-                    if (file.getName().contains(MP3_FILE_EXTENSION)) {
-                        try {
-                            fileTagService.processFile(file, genre, errorLines);
-                        } catch (Exception e) {
-                            log.error(e);
-                        }
-                    }
-                }
-            } else {
-                log.error(String.format("Error: Files not found at: %s", dir.getAbsolutePath()));
-            }
-        }
         resultsWriter.export(errorOutPutFile, errorLines);
-        log.info("Execution Completed in: " + Duration.between(start, Instant.now()));
     }
 
 }
