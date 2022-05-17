@@ -13,7 +13,7 @@ artist - title.mp3
 WARNING after many requests you may get blocked  for a couple of minutes, so is not recommended process many files at once.
 
 
-* The Album tag is always the same than the artist. In my collection, i just group the song by Artist but you can adapt this to get the Album tag similarly than the Year tag.
+* The Album tag is always the same as the artist. In my collection, I just group the song by Artist, but you can adapt this to get the Album tag similarly than the Year tag.
 
 
 
