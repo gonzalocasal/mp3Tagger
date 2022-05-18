@@ -15,20 +15,16 @@ public class FilesProcessor {
 
     static final Logger log = LogManager.getLogger(FilesProcessor.class);
 
-    private final String rootFolder;
-    private final List<String> genresFolders;
     private final FileTagService fileTagService;
 
     public FilesProcessor() {
-        this.rootFolder = ROOT_FOLDER;
-        this.genresFolders = GENRES_FOLDERS;
         this.fileTagService = new FileTagService();
     }
 
     public void process () {
-        genresFolders.parallelStream().forEach(genre -> {
+        GENRES_FOLDERS.parallelStream().forEach(genre -> {
             log.info("Processing: {}", genre);
-            File dir = new File(rootFolder + genre);
+            File dir = new File(ROOT_FOLDER + genre);
             List<File> files = Arrays.asList(Objects.requireNonNull(dir.listFiles()));
             files.parallelStream().forEach(file -> fileTagService.processFile(file, genre));
         });
