@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
@@ -52,7 +53,7 @@ public class FileTagService {
 
     }
 
-    private ID3v23Tag generateNewTag(File file, String genre, Tag oldTag) {
+    private ID3v23Tag generateNewTag(File file, String genre, Tag oldTag) throws FieldDataInvalidException {
         log.info("Processing: {}", file);
         String fileName = file.getName().replace(MP3_FILE_EXTENSION, "");
         ID3v23Tag newTag = new ID3v23Tag();
@@ -68,6 +69,7 @@ public class FileTagService {
 
         } catch (Exception e) {
             log.error("ERROR occurred trying to generate new tags for: {}", file.getName());
+            throw e;
         }
         return newTag;
     }
