@@ -1,6 +1,5 @@
 package com.tagmp3.service;
 
-import com.tagmp3.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +13,7 @@ import static com.tagmp3.util.Constants.ROOT_FOLDER;
 
 public class FilesProcessor {
 
-    final static Logger log = LogManager.getLogger(Application.class);
+    static final Logger log = LogManager.getLogger(FilesProcessor.class);
 
     private final String rootFolder;
     private final List<String> genresFolders;
@@ -31,9 +30,7 @@ public class FilesProcessor {
             log.info("Processing: {}", genre);
             File dir = new File(rootFolder + genre);
             List<File> files = Arrays.asList(Objects.requireNonNull(dir.listFiles()));
-            files.parallelStream().forEach(file -> {
-                fileTagService.processFile(file, genre);
-            });
+            files.parallelStream().forEach(file -> fileTagService.processFile(file, genre));
         });
     }
 

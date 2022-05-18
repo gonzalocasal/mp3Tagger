@@ -1,6 +1,5 @@
 package com.tagmp3.service;
 
-import com.tagmp3.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jaudiotagger.audio.AudioFile;
@@ -15,6 +14,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.net.URLEncoder;
+import java.util.Optional;
 
 import static com.tagmp3.util.Constants.FILENAME_ARTIST_TRACK_SEPARATOR;
 import static com.tagmp3.util.Constants.GOOGLE_SEARCH_ENCODE;
@@ -26,7 +26,7 @@ import static com.tagmp3.util.Constants.MP3_PROCESSED_COMMENT;
 
 public class FileTagService {
 
-    final static Logger log = LogManager.getLogger(Application.class);
+    static final Logger log = LogManager.getLogger(FileTagService.class);
 
     public void processFile(File file, String genre) {
         if (!file.getName().contains(MP3_FILE_EXTENSION)) {
@@ -64,14 +64,7 @@ public class FileTagService {
             newTag.setField(oldTag.getFirstArtwork());
             newTag.deleteField(FieldKey.TRACK);
             newTag.setField(FieldKey.COMMENT, MP3_PROCESSED_COMMENT);
-
-            String yearFromGoogle = getYearFromGoogle(fileName);
-
-            if (yearFromGoogle != null) {
-                newTag.setField(FieldKey.YEAR, yearFromGoogle);
-            } else {
-                newTag.setField(FieldKey.YEAR, oldTag.getFirst(FieldKey.YEAR));
-            }
+            newTag.setField(FieldKey.YEAR, getYearFromGoogle(fileName).orElse(oldTag.getFirst(FieldKey.YEAR)));
 
         } catch (Exception e) {
             log.error("ERROR occurred trying to generate new tags for: {}", file.getName());
@@ -80,15 +73,14 @@ public class FileTagService {
     }
 
 
-    private String getYearFromGoogle(String songName) {
+    private Optional<String> getYearFromGoogle(String songName) {
         try {
             String url = GOOGLE_SEARCH_URL + URLEncoder.encode(songName + GOOGLE_SEARCH_URL_SEARCH_PARAM, GOOGLE_SEARCH_ENCODE);
             Document doc = Jsoup.connect(url).get();
-
-            return doc.getElementsByClass(GOOGLE_SEARCH_MAGIC_CLASS).get(0).childNode(0).toString().trim();
+            return Optional.of(doc.getElementsByClass(GOOGLE_SEARCH_MAGIC_CLASS).get(0).childNode(0).toString().trim());
         } catch (Exception e) {
             log.error("ERROR occurred trying to get Year tag from Google for: {}", songName);
-            return null;
+            return Optional.empty();
         }
     }
 

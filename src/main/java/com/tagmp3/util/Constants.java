@@ -4,6 +4,8 @@ import java.util.List;
 
 public class Constants {
 
+    private Constants(){}
+
     public static final String FILENAME_ARTIST_TRACK_SEPARATOR = " - ";
     public static final String GOOGLE_SEARCH_ENCODE = "UTF-8";
     public static final String GOOGLE_SEARCH_MAGIC_CLASS = "Z0LcW";

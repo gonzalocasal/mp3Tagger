@@ -9,7 +9,7 @@ import java.time.Instant;
 
 public class Application {
 
-    final static Logger log = LogManager.getLogger(Application.class.getName());
+    static final Logger log = LogManager.getLogger(Application.class.getName());
 
     public static void main(String[] args) {
         java.util.logging.LogManager.getLogManager().reset();
