@@ -40,7 +40,7 @@ public class FileTagService {
             if (MP3_PROCESSED_COMMENT.equals(oldTag.getFirst(FieldKey.COMMENT))){
                 return;
             }
-
+            log.info("Processing: {}", file);
             ID3v23Tag newTag = generateNewTag(file, genre, oldTag);
 
             AudioFileIO.delete(mp3);
@@ -50,11 +50,9 @@ public class FileTagService {
         } catch (Exception e) {
             log.error("ERROR occurred trying to process: {}", file.getName());
         }
-
     }
 
     private ID3v23Tag generateNewTag(File file, String genre, Tag oldTag) throws FieldDataInvalidException {
-        log.info("Processing: {}", file);
         String fileName = file.getName().replace(MP3_FILE_EXTENSION, "");
         ID3v23Tag newTag = new ID3v23Tag();
         try {
@@ -62,18 +60,15 @@ public class FileTagService {
             newTag.setField(FieldKey.TITLE, fileName.split(FILENAME_ARTIST_TRACK_SEPARATOR)[1].trim());
             newTag.setField(FieldKey.ALBUM, fileName.split(FILENAME_ARTIST_TRACK_SEPARATOR)[0].trim());
             newTag.setField(FieldKey.GENRE, genre);
-            newTag.setField(oldTag.getFirstArtwork());
-            newTag.deleteField(FieldKey.TRACK);
             newTag.setField(FieldKey.COMMENT, MP3_PROCESSED_COMMENT);
             newTag.setField(FieldKey.YEAR, getYearFromGoogle(fileName).orElse(oldTag.getFirst(FieldKey.YEAR)));
-
+            newTag.setField(oldTag.getFirstArtwork());
         } catch (Exception e) {
             log.error("ERROR occurred trying to generate new tags for: {}", file.getName());
             throw e;
         }
         return newTag;
     }
-
 
     private Optional<String> getYearFromGoogle(String songName) {
         try {
