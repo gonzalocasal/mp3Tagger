@@ -11,7 +11,10 @@
         </File>
     </Appenders>
     <Loggers>
-        <Logger name="com.tagmp3.Application" level="debug" additivity="false">
+        <Root level="debug">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <Logger name="com.tagmp3" level="debug" additivity="false">
             <AppenderRef ref = "Console" level ="debug"/>
             <AppenderRef ref = "File" level = "error"/>
         </Logger>
