@@ -50,8 +50,3 @@ All the other tags are empty, and the Album Artwork remains if the file already 
 ```
  mvn clean package
 ```
-
-### Execute
-```
-mvn spring-boot:run
-```
