@@ -13,7 +13,7 @@ public class Constants {
     public static final String GOOGLE_SEARCH_URL_SEARCH_PARAM = " cancion fecha de lanzamiento";
     public static final String MP3_FILE_EXTENSION = ".mp3";
     public static final String MP3_PROCESSED_COMMENT = "mp3Tagger";
-    public static final String ROOT_FOLDER = "/Users/gonzalo/Música/";
+    public static final String ROOT_FOLDER = "/Users/gonzalo/Library/Mobile Documents/com~apple~CloudDocs/Música/";
     public static final List<String> GENRES_FOLDERS = List.of("Cumbia","Dance","Folklore","Pop","Pop Latino","Reggae","Retro","Rock","Rock Latino");
 
 }
